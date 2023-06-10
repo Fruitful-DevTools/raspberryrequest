@@ -1,0 +1,37 @@
+# Contributing
+
+Thank you for considering contributing to the project! We welcome contributions from the community. To get started, please follow the guidelines below.
+
+## Table of Contents
+- [Bug Reports](#bug-reports)
+- [Feature Requests](#feature-requests)
+- [Pull Requests](#pull-requests)
+- [Code Style](#code-style)
+- [License](#license)
+
+## Bug Reports
+
+If you encounter any issues or bugs, please [open an issue](link-to-issue-tracker) and provide detailed information about the problem. Include steps to reproduce and any relevant error messages or logs.
+
+## Feature Requests
+
+If you have any ideas or feature requests, we would love to hear them! [Open an issue](link-to-issue-tracker) and describe the requested feature or enhancement.
+
+## Pull Requests
+
+We welcome pull requests! To contribute code to the project, please follow these steps:
+1. Fork the repository
+2. Create a new branch for your feature or bug fix
+3. Implement your changes
+4. Write tests, if applicable
+5. Run the existing tests to ensure they pass
+6. Commit your changes and push to your forked repository
+7. Submit a pull request to the main repository
+
+## Code Style
+
+We follow a specific code style in this project. Please make sure your code adheres to the style guidelines. For details, refer to the [style guide](link-to-style-guide).
+
+## License
+
+By contributing to this project, you agree that your contributions will be licensed under the [project license](link-to-license).

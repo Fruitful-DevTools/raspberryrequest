@@ -1,0 +1,21 @@
+
+/* Structure */
+
+main .container-fluid {
+    max-width: 50vw;
+    padding-top: 2%;
+}
+
+.row, p, .body-text {
+    padding-top: 2%;
+    padding-bottom: 2%;
+}
+
+.hero-text-body {
+    font-weight: 500;
+}
+
+/* Footer */
+footer {
+    padding-top: 200px;
+}
