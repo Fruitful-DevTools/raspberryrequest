@@ -1,0 +1,22 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "request_handler"
+version = "0.0.1"
+authors = [
+  { name="Charlie Marshall", email="charlie.marshall1996@gmail.com" },
+]
+description = "Package to handle API requests easily, with built-in back-off and response handling."
+readme = "README.md"
+requires-python = ">=3.11.4"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/IAMMOKZEEEE/request_handler"
+"Bug Tracker" = "https://github.com/IAMMOKZEEEE/request_handler/issues"
