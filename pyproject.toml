@@ -3,14 +3,14 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "request_handler"
+name = "raspberry_request"
 version = "0.0.1"
 authors = [
   { name="Charlie Marshall", email="charlie.marshall1996@gmail.com" },
 ]
 description = "Package to handle API requests easily, with built-in back-off and response handling."
 readme = "README.md"
-requires-python = ">=3.11.4"
+requires-python = ">=3.11.0"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
