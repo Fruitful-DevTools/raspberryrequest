@@ -1,16 +1,26 @@
 from typing import Optional
 
 
-class StatusCodeError(Exception):
+class RapsberryRequestError(Exception):
+    def __init__(self, message: Optional[str] = None):
+        super().__init__(message or 'Error in RaspberryRequest.')
+
+
+class MaxRetryError(RapsberryRequestError):
+    def __init__(self, message: Optional[str] = None):
+        super().__init__(message or 'Maximum number of request retries reached.')
+
+
+class StatusCodeError(RapsberryRequestError):
     def __init__(self, message: Optional[str] = None):
         super().__init__(message or 'Error in status code.')
 
 
-class UnusableStatusCode(StatusCodeError):
+class NonRetryableStatusCodeError(StatusCodeError):
     def __init__(self, message: Optional[str] = None):
         super().__init__(message or 'Unusable status code.')
 
 
-class FatalStatusCode(StatusCodeError):
+class FatalStatusCodeError(StatusCodeError):
     def __init__(self, message: Optional[str] = None):
         super().__init__(message or 'Fatal status code. Raspberry request will stop.')

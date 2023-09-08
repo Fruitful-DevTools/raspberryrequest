@@ -1,3 +1,2 @@
 from modules.calculate_backoff import calculate_backoff
-from modules.handle_error import handle_error
-from modules.handle_response import handle_response
+from modules.valid_status import valid_status

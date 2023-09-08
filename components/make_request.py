@@ -10,8 +10,8 @@ def make_request(
         data: Dict[str, str], session) -> requests.Response:
 
     if method == 'GET':
-        return session.get(base_url, headers=headers, params=params, timeout=30)
+        return session.get(base_url, headers=headers, params=params)
     elif method == 'POST':
-        return session.post(base_url, headers=headers, params=params, json=data, timeout=30)
+        return session.post(base_url, headers=headers, params=params, json=data)
     else:
         raise ValueError(f'Invalid HTTP method: {method}')
