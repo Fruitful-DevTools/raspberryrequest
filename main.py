@@ -1,5 +1,4 @@
-import logging
-from typing import Dict
+from typing import Dict, Literal
 import requests
 import time
 from requests import ReadTimeout, Timeout, HTTPError
@@ -27,7 +26,7 @@ class APIRequestHandler:
     def send_api_request(
             self,
             base_url: str,
-            method: str = 'GET',
+            method: Literal['GET', 'POST'] = 'GET',
             params: Dict[str, str] = None,
             data: Dict[str, str] = None,
             headers: Dict[str, str] = None) -> Dict:

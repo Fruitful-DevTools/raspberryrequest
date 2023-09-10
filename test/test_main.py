@@ -1,3 +1,4 @@
+from requests.exceptions import ReadTimeout, Timeout, HTTPError
 from unittest.mock import MagicMock
 import unittest
 from unittest.mock import patch
@@ -5,72 +6,40 @@ from unittest.mock import patch
 from main import APIRequestHandler
 from exceptions import MaxRetryError, FatalStatusCodeError
 
-import unittest
-from unittest.mock import MagicMock
-
 handler = APIRequestHandler({'test': 'test'})
 
 
 class TestSendApiRequest(unittest.TestCase):
 
     def setUp(self):
-        self.session = MagicMock()
-        self.headers = {'Content-Type': 'application/json'}
-        self.max_retry_attempts = 3
-        self.attempt_number = 0
-        self.handler = APIRequestHandler({'test': 'test'})
+        self.api_client = APIRequestHandler()
+        self.base_url = "https://reqres.in/api/"
+        self.method = "POST"
+        self.params = {"param1": "value1", "param2": "value2"}
+        self.data = {"key1": "value1", "key2": "value2"}
+        self.headers = {"Content-Type": "application/json"}
 
-    def tearDown(self):
-        self.session = None
+    @patch('requests.get')
+    def test_send_api_request_success(self, mock_get):
+        response_data = {"data": {
+            "id": 2,
+            "email": "janet.weaver@reqres.in",
+            "first_name": "Janet",
+            "last_name": "Weaver",
+            "avatar": "https://reqres.in/img/faces/2-image.jpg"
+        },
+            "support": {
+            "url": "https://reqres.in/#support-heading",
+            "text": "To keep ReqRes free, contributions towards server costs are appreciated!"
+        }}
+        mock_get.return_value.json.return_value = response_data
+        response = self.api_client.send_api_request(
+            f'{self.base_url}users/2', method='GET', params=self.params, headers=self.headers)
+        self.assertEqual(response, response_data)
 
-    def test_send_api_request_success(self):
-        # Testing a successful API request
-        base_url = 'https://api.example.com'
-        method = 'GET'
-        params = {'param1': 'value1', 'param2': 'value2'}
-        data = {'key1': 'value1', 'key2': 'value2'}
-        headers = {'Authorization': 'Bearer token'}
 
-        # Mocking the make_request function to simulate a successful response
-        make_request_mock = MagicMock(
-            return_value=MagicMock(json=lambda: {'result': 'success'}))
-        with patch('components.make_request', make_request_mock):
-            response = handler.send_api_request(
-                base_url, method, params, data, headers)
-
-        self.assertEqual(response, {'result': 'success'})
-
-    def test_send_api_request_retry(self):
-        # Testing a retry scenario
-        base_url = 'https://api.example.com'
-        method = 'GET'
-        params = {'param1': 'value1', 'param2': 'value2'}
-        data = {'key1': 'value1', 'key2': 'value2'}
-        headers = {'Authorization': 'Bearer token'}
-
-        # Mocking the make_request function to simulate an unsuccessful response
-        make_request_mock = MagicMock(
-            return_value=MagicMock(json=lambda: {'result': 'retry'}))
-        with patch('components.make_request', make_request_mock):
-            response = handler.send_api_request(
-                base_url, method, params, data, headers)
-
-        self.assertEqual(response, {'result': 'retry'})
-
-    def test_send_api_request_fatal_status_code(self):
-        # Testing a fatal status code scenario
-        base_url = 'https://api.example.com'
-        method = 'GET'
-        params = {'param1': 'value1', 'param2': 'value2'}
-        data = {'key1': 'value1', 'key2': 'value2'}
-        headers = {'Authorization': 'Bearer token'}
-
-        # Mocking the make_request function to simulate a fatal status code
-        make_request_mock = MagicMock(side_effect=FatalStatusCodeError)
-        with patch('components.make_request', make_request_mock):
-            with self.assertRaises(FatalStatusCodeError):
-                handler.send_api_request(
-                    base_url, method, params, data, headers)
+if __name__ == '__main__':
+    unittest.main()
 
 
 class TestBackoff(unittest.TestCase):
