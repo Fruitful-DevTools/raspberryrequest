@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "raspberry_request"
+name = "raspberryrequest"
 version = "0.0.1"
 authors = [
   { name="Charlie Marshall", email="charlie.marshall1996@gmail.com" },
@@ -18,5 +18,5 @@ classifiers = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/IAMMOKZEEEE/request_handler"
-"Bug Tracker" = "https://github.com/IAMMOKZEEEE/request_handler/issues"
+"Homepage" = "https://github.com/Fruitful-DevTools/raspberryrequest"
+"Bug Tracker" = "https://github.com/Fruitful-DevTools/raspberryrequest/issues"
