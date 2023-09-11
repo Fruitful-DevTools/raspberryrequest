@@ -1,7 +1,7 @@
 import requests
 
-from exceptions import NonRetryableStatusCodeError, FatalStatusCodeError
-from models import StatusCodes
+from raspberryrequest.exceptions import NonRetryableStatusCodeError, FatalStatusCodeError
+from raspberryrequest.models import StatusCodes
 
 codes = StatusCodes()
 

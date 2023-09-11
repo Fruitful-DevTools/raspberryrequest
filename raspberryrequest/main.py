@@ -3,9 +3,9 @@ import requests
 import time
 from requests import ReadTimeout, Timeout, HTTPError
 
-from components import make_request
-from modules import calculate_backoff, valid_status
-from exceptions import FatalStatusCodeError, MaxRetryError
+from raspberryrequest.components import make_request
+from raspberryrequest.modules import calculate_backoff, valid_status
+from raspberryrequest.exceptions import FatalStatusCodeError, MaxRetryError
 
 
 class APIRequestHandler:
