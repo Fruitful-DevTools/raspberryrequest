@@ -1,10 +1,8 @@
-from requests.exceptions import ReadTimeout, Timeout, HTTPError
-from unittest.mock import MagicMock
 import unittest
 from unittest.mock import patch
 
 from main import APIRequestHandler
-from exceptions import MaxRetryError, FatalStatusCodeError
+from exceptions import MaxRetryError
 
 handler = APIRequestHandler({'test': 'test'})
 
