@@ -1,8 +1,8 @@
 import unittest
 from unittest.mock import patch
 
-from main import APIRequestHandler
-from exceptions import MaxRetryError
+from raspberryrequest.main import APIRequestHandler
+from raspberryrequest.exceptions import MaxRetryError
 
 handler = APIRequestHandler({'test': 'test'})
 

@@ -1,2 +1,2 @@
-from modules.calculate_backoff import calculate_backoff
-from modules.valid_status import valid_status
+from raspberryrequest.modules.calculate_backoff import calculate_backoff
+from raspberryrequest.modules.valid_status import valid_status

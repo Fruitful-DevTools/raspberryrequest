@@ -1,1 +1,1 @@
-from components.make_request import make_request
+from raspberryrequest.components.make_request import make_request
