@@ -48,19 +48,22 @@ class APIRequestHandler:
         """
         headers = headers or self.headers
         self.attempt_number = 1
-        while self.attempt_number <= self.max_retry_attempts:
-            try:
-                response = make_request(
-                    base_url, method, headers, params, data, self.session)
-                if valid_status(response):
-                    return response.json()
-                self.backoff()
-            except (ReadTimeout, Timeout, HTTPError):
-                self.backoff()
-            except FatalStatusCodeError as exc:
-                self.session.close()
-                raise FatalStatusCodeError() from exc
-        self.session.close()
+
+        try:
+            while self.attempt_number <= self.max_retry_attempts:
+                try:
+                    response = make_request(
+                        base_url, method, headers, params, data, self.session)
+                    if valid_status(response):
+                        return response.json()
+                    self.backoff()
+                except (ReadTimeout, Timeout, HTTPError):
+                    self.backoff()
+                except FatalStatusCodeError as exc:
+                    self.session.close()
+                    raise FatalStatusCodeError() from exc
+        finally:
+            self.session.close()
 
     def backoff(self):
         """
