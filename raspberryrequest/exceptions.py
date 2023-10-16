@@ -1,17 +1,17 @@
 from typing import Optional
 
 
-class RapsberryRequestError(Exception):
+class RaspberryRequestError(Exception):
     def __init__(self, message: Optional[str] = None):
         super().__init__(message or 'Error in RaspberryRequest.')
 
 
-class MaxRetryError(RapsberryRequestError):
+class MaxRetryError(RaspberryRequestError):
     def __init__(self, message: Optional[str] = None):
         super().__init__(message or 'Maximum number of request retries reached.')
 
 
-class StatusCodeError(RapsberryRequestError):
+class StatusCodeError(RaspberryRequestError):
     def __init__(self, message: Optional[str] = None):
         super().__init__(message or 'Error in status code.')
 
