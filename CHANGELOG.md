@@ -24,3 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - models.py. Status codes are now in config.py
 - components directory.
+
+### Fixed
+
+- Import error for module package

@@ -1,5 +1,5 @@
-from raspberryrequest.exceptions import FatalStatusCodeError, MaxRetryError, NonRetryableStatusCodeError
-from modules import calculate_backoff, valid_status
+from .exceptions import FatalStatusCodeError, MaxRetryError, NonRetryableStatusCodeError
+from .modules import calculate_backoff, valid_status
 import logging
 from typing import Dict, Literal
 import requests
