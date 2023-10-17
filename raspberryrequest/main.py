@@ -1,10 +1,11 @@
-from .exceptions import FatalStatusCodeError, MaxRetryError, NonRetryableStatusCodeError
-from .modules import calculate_backoff, valid_status
 import logging
 from typing import Dict, Literal
 import requests
 import time
 from requests import ReadTimeout, Timeout, HTTPError
+
+from .exceptions import FatalStatusCodeError, MaxRetryError, NonRetryableStatusCodeError
+from .modules import calculate_backoff, valid_status
 
 logger = logging.basicConfig(
     level=logging.INFO,
