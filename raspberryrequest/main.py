@@ -1,11 +1,16 @@
+from raspberryrequest.exceptions import FatalStatusCodeError, MaxRetryError, NonRetryableStatusCodeError
+from modules import calculate_backoff, valid_status
+import logging
 from typing import Dict, Literal
 import requests
 import time
 from requests import ReadTimeout, Timeout, HTTPError
 
-from raspberryrequest.components import make_request
-from raspberryrequest.modules import calculate_backoff, valid_status
-from raspberryrequest.exceptions import FatalStatusCodeError, MaxRetryError
+logger = logging.basicConfig(
+    level=logging.INFO,
+    format=' %(asctime)s - %(levelname)s - %(message)s',
+    handlers=[logging.StreamHandler(), logging.FileHandler('proxypull.log')]
+)
 
 
 class APIRequestHandler:
@@ -19,9 +24,11 @@ class APIRequestHandler:
             headers: The headers to be included in the API requests.
             max_retry_attempts: The maximum number of retry attempts for failed requests.
         """
+        logging.info('Initializing APIRequestHandler...')
         self.headers = headers or {}
         self.max_retry_attempts = max_retry_attempts
         self.session = requests.Session()
+        self.session.headers.update(self.headers)
 
     def send_api_request(
             self,
@@ -51,18 +58,24 @@ class APIRequestHandler:
 
         try:
             while self.attempt_number <= self.max_retry_attempts:
+                response = make_request(
+                    base_url, method, headers, params, data, self.session)
                 try:
-                    response = make_request(
-                        base_url, method, headers, params, data, self.session)
                     if valid_status(response):
                         return response.json()
-                    self.backoff()
                 except (ReadTimeout, Timeout, HTTPError):
+                    logging.debug('Request error.')
                     self.backoff()
+                except NonRetryableStatusCodeError:
+                    logging.debug('Non-retryable status code.')
+                    return None
                 except FatalStatusCodeError as exc:
+                    logging.warning('Fatal status code.')
                     self.session.close()
                     raise FatalStatusCodeError() from exc
+                self.backoff()
         finally:
+            logging.info('Closing session...')
             self.session.close()
 
     def backoff(self):

@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import Mock
-from modules import valid_status
-from exceptions import NonRetryableStatusCodeError, FatalStatusCodeError
+from raspberryrequest.modules import valid_status
+from raspberryrequest.exceptions import NonRetryableStatusCodeError, FatalStatusCodeError
 import requests
 
 

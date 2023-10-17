@@ -1,11 +1,11 @@
 import unittest
 import pytest
-from components import make_request
+from raspberryrequest.modules import make_request
 from unittest.mock import Mock, patch
 
 
 class MakeRequestTestCase(unittest.TestCase):
-    @patch('components.make_request.requests.Session')
+    @patch('raspberryrequest.modules.make_request.requests.Session')
     def test_make_request_get(self, mock_session):
         # Create a mock response object for the request
         mock_response = Mock()
@@ -32,7 +32,7 @@ class MakeRequestTestCase(unittest.TestCase):
         mock_get.assert_called_once_with(
             base_url, headers=headers, params=params)
 
-    @patch('components.make_request.requests.Session')
+    @patch('raspberryrequest.modules.make_request.requests.Session')
     def test_make_request_post(self, mock_session):
         # Create a mock response object for the request
         mock_response = Mock()
@@ -59,7 +59,7 @@ class MakeRequestTestCase(unittest.TestCase):
         mock_post.assert_called_once_with(
             base_url, headers=headers, params=params, json=data)
 
-    @patch('components.make_request.requests.Session')
+    @patch('raspberryrequest.modules.make_request.requests.Session')
     def test_make_request_invalid_method(self, mock_session):
         base_url = "http://example.com"
         method = "PUT"  # An invalid HTTP method

@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch
-from modules import calculate_backoff
+from raspberryrequest.modules import calculate_backoff
 
 
 class TestCalculateBackoff(unittest.TestCase):
