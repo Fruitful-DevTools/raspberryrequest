@@ -5,7 +5,7 @@ import time
 from requests import ReadTimeout, Timeout, HTTPError
 
 from .exceptions import FatalStatusCodeError, MaxRetryError, NonRetryableStatusCodeError
-from .modules import calculate_backoff, valid_status
+from .modules import calculate_backoff, valid_status, make_request
 
 logger = logging.basicConfig(
     level=logging.INFO,
@@ -60,7 +60,7 @@ class APIRequestHandler:
         try:
             while self.attempt_number <= self.max_retry_attempts:
                 response = make_request(
-                    base_url, method, headers, params, data, self.session)
+                    base_url, method, headers, params, self.session)
                 try:
                     if valid_status(response):
                         return response.json()
