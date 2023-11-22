@@ -1,7 +1,7 @@
 import unittest
 import random
 from unittest.mock import patch
-from raspberryrequest.modules import calculate_backoff
+from raspberryrequest.backoff import calculate_backoff
 
 
 class TestCalculateBackoff(unittest.TestCase):
@@ -14,23 +14,23 @@ class TestCalculateBackoff(unittest.TestCase):
                 if expected > 10:
                     expected = 10
 
-                jitter = random.uniform(0, 1)
+                jitter = random.random()
                 expected = expected * (1 + jitter)
-                with patch('random.uniform', return_value=jitter):
+                with patch('random.random', return_value=jitter):
                     self.assertEqual(calculate_backoff(case), expected)
 
     def test_edge_case_zero(self):
-        jitter = random.uniform(0, 1)
+        jitter = random.random()
         expected = (1 + jitter)
-        with patch('random.uniform', return_value=jitter):
+        with patch('random.random', return_value=jitter):
             self.assertEqual(calculate_backoff(0), expected)
 
     def test_edge_case_high(self):
         attempt_num = 100
         delay = min(2 ** attempt_num, 10)
-        jitter = random.uniform(0, 1)
+        jitter = random.random()
         expected = delay * (1 + jitter)
-        with patch('random.uniform', return_value=jitter):
+        with patch('random.random', return_value=jitter):
             self.assertEqual(calculate_backoff(attempt_num), expected)
 
     def test_raises_no_input(self):

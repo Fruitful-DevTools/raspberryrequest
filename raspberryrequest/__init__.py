@@ -1,1 +1,1 @@
-from raspberryrequest.main import APIRequestHandler
+from .main import APIRequestHandler

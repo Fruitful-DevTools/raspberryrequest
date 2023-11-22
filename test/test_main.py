@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import patch, call
 import requests
 from raspberryrequest.main import APIRequestHandler
-from raspberryrequest.exceptions import MaxRetryError, NonRetryableStatusCodeError
+from raspberryrequest.exceptions import MaxRetryError, FatalStatusCodeError
 
 handler = APIRequestHandler({'test': 'test'})
 
@@ -51,7 +51,7 @@ class TestSendApiRequest(unittest.TestCase):
             with self.assertRaises(MaxRetryError):
                 self.api_client.send_api_request(
                     self.base_url, self.method, self.params, self.headers)
-            attempts = self.api_client.calls()
+            attempts = self.api_client.calls
             self.assertEqual(attempts, 3)
 
     def test_HTTPError(self):
@@ -60,18 +60,24 @@ class TestSendApiRequest(unittest.TestCase):
             with self.assertRaises(MaxRetryError):
                 self.api_client.send_api_request(
                     self.base_url, self.method, self.params, self.headers)
-            attempts = self.api_client.calls()
+            attempts = self.api_client.calls
             self.assertEqual(attempts, 3)
 
     def test_NonRetryableStatusCodeError(self):
         self.base_url = "https://reqres.in/api/users/23"
-
         result = self.api_client.send_api_request(
             self.base_url, self.method, self.params, self.headers)
         self.assertIsNone(result)
 
     def test_FatalStatusCodeError(self):
-        pass
+        response = requests.Response()
+        response.status_code = 403
+        response.reason = "test"
+        with patch("requests.Session.send") as mock_send:
+            mock_send.return_value = response
+            with self.assertRaises(FatalStatusCodeError):
+                self.api_client.send_api_request(
+                    self.base_url, self.method, self.params, self.headers)
 
     def test_edge_case_no_base_url(self):
         pass

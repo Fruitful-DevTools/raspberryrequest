@@ -4,35 +4,42 @@ import requests
 import time
 from requests import ReadTimeout, Timeout, HTTPError
 
-from .exceptions import FatalStatusCodeError, MaxRetryError, NonRetryableStatusCodeError
-from .modules import calculate_backoff, valid_status, make_request
+from .exceptions import (FatalStatusCodeError, MaxRetryError,
+                         NonRetryableStatusCodeError)
+from .backoff import calculate_backoff
+from .validate import valid_status
+from .request import make_request
 
 logger = logging.basicConfig(
     level=logging.WARNING,
     format=' %(asctime)s - %(levelname)s - %(message)s',
-    handlers=[logging.StreamHandler(), logging.FileHandler('proxypull.log')]
+    handlers=[logging.StreamHandler(),
+              logging.FileHandler('proxypull.log')]
 )
 
 
 class APIRequestHandler:
-    call_number: int
+    call_number = 0
 
-    def __init__(self, headers: Dict[str, str] = None, max_retry_attempts: int = 3):
+    def __init__(self, headers: Dict[str, str] = None,
+                 max_attempts: int = 3, max_delay: int = 10):
         """
         Initializes the API Request Handler.
 
         Args:
         -----
-        - headers: The headers to be included in the API
-        requests.
-        - max_retry_attempts: The maximum number of retry
+        - `headers` (`dict`): The headers to be included in the
+        API requests.
+        - `max_attempts` (`int`): The maximum number of retry
         attempts for failed requests.
+        - `max_delay` (`int`): The maximum delay allowed for
+        backoff.
         """
         self.headers = headers or {}
-        self.max_retry_attempts = max_retry_attempts
+        self.max_attempts = max_attempts
+        self.max_delay = max_delay
         self.session = requests.Session()
         self.session.headers.update(self.headers)
-        self.call_number = 0
 
     def send_api_request(
             self,
@@ -46,7 +53,8 @@ class APIRequestHandler:
         Args:
         -----
         - `base_url`: The base URL of the API.
-        - `method`: The HTTP method of the request (GET or POST).
+        - `method`: The HTTP method of the request (`GET` or
+        `POST`).
         - `params`: The query parameters to be included in the
         request.
         - `headers`: The headers to be included in the request.
@@ -62,21 +70,22 @@ class APIRequestHandler:
         """
         headers = headers or self.headers
 
-        while self.call_number <= self.max_retry_attempts:
+        while self.call_number <= self.max_attempts:
             try:
                 self.call_number += 1
                 response = make_request(
                     base_url, method, headers, params, self.session)
             except (ReadTimeout, Timeout, HTTPError):
                 self._backoff(base_url, method, params, headers)
+
+            try:
+                if valid_status(response):
+                    return response.json()
             except NonRetryableStatusCodeError:
                 return None
             except FatalStatusCodeError:
                 self.close_session()
                 raise FatalStatusCodeError()
-
-            if valid_status(response):
-                return response.json()
 
             self._backoff(base_url, method, params, headers)
 
@@ -84,25 +93,28 @@ class APIRequestHandler:
         """
         Closes the current session.
 
-        This function resets the call number to 0 and closes the session.
-
-        Parameters:
-            None
-
-        Returns:
-            None
+        This function resets the call number to 0 and closes the
+        session.
         """
         self.call_number = 0
         self.session.close()
 
+    @property
     def calls(self):
+        """
+        Returns the number of calls made in the current session.
+        """
         return self.call_number
 
-    def _backoff(self, base_url: str, method: Literal['GET', 'POST'] = 'GET',
-                 params: Dict[str, str] = None, headers: Dict[str, str] = None) -> None:
-        if self.call_number < self.max_retry_attempts:
+    def _backoff(self, base_url: str,
+                 method: Literal['GET', 'POST'] = 'GET',
+                 params: Dict[str, str] = None,
+                 headers: Dict[str, str] = None) -> None:
+
+        if self.call_number < self.max_attempts:
             delay = calculate_backoff(self.call_number)
             time.sleep(delay)
-            self.send_api_request(base_url, method, params, headers)
+            self.send_api_request(base_url, method, params,
+                                  headers)
         else:
             raise MaxRetryError("Max retry attempts reached.")
