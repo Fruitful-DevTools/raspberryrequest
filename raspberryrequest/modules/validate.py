@@ -4,23 +4,21 @@ from raspberryrequest.config import VALID, NONRETRYABLE, RETRYABLE, FATAL
 from raspberryrequest.exceptions import NonRetryableStatusCodeError, FatalStatusCodeError
 
 logging.basicConfig(
-    level=logging.WARNING,
+    level=logging.DEBUG,
     format=' %(asctime)s - %(levelname)s - %(message)s',
     handlers=[logging.StreamHandler(), logging.FileHandler('proxypull.log')]
 )
 
 
 def valid_status(response: requests.Response) -> bool:
-    if not response.text:
-        logging.warning('No response.')
+    print(response.text)
+    if not response.status_code:
+        logging.warning('No response status code.')
         return False
-    response_dict = response.json()
 
-    try:
-        code = response_dict['code']
-    except (AttributeError, KeyError):
-        code = response.status_code
-    logging.debug('CODE: ', type(code))
+    code = response.status_code
+
+    logging.debug('CODE: ', code)
     if response.status_code in VALID or code in VALID:
         logging.debug('Valid response code.')
         return True

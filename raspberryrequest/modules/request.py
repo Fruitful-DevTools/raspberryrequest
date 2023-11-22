@@ -13,6 +13,7 @@ def make_request(
         request = session.prepare_request(
             Request(method=method, url=base_url, headers=headers, params=params))
         response = session.send(request=request)
+        print(response)
         return response
     except RequestException as e:
-        return None
+        raise e

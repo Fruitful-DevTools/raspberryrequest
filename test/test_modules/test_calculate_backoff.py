@@ -1,31 +1,49 @@
 import unittest
+import random
 from unittest.mock import patch
 from raspberryrequest.modules import calculate_backoff
 
 
 class TestCalculateBackoff(unittest.TestCase):
+    def test_happy_path(self):
+        test_cases = [1, 2, 3, 4, 5]
 
-    @patch('modules.calculate_backoff.random.uniform')
-    def test_calculate_backoff(self, mock_uniform):
-        # Set the mocked return value for random.uniform
-        mock_uniform.side_effect = [0.5, 0.5, 0.5]
+        for case in test_cases:
+            with self.subTest(f"Happy Path: {case}"):
+                expected = 2**case
+                if expected > 10:
+                    expected = 10
 
-        # Test with attempt_number = 0
-        result_0 = calculate_backoff(0)
-        self.assertEqual(result_0, 1.5)  # Delay = 1 * (1 + 0.5) = 1.5
+                jitter = random.uniform(0, 1)
+                expected = expected * (1 + jitter)
+                with patch('random.uniform', return_value=jitter):
+                    self.assertEqual(calculate_backoff(case), expected)
 
-        # Test with attempt_number = 1
-        result_1 = calculate_backoff(1)
-        self.assertEqual(result_1, 3.0)  # Delay = 2 * (1 + 0.5) = 3.0
+    def test_edge_case_zero(self):
+        jitter = random.uniform(0, 1)
+        expected = (1 + jitter)
+        with patch('random.uniform', return_value=jitter):
+            self.assertEqual(calculate_backoff(0), expected)
 
-        # Test with attempt_number = 5 (limited to a maximum delay of 10)
-        result_5 = calculate_backoff(5)
-        # Delay = 10 * (1 + 0.5) = 15.0 (limited to 10)
-        self.assertEqual(result_5, 15.0)
+    def test_edge_case_high(self):
+        attempt_num = 100
+        delay = min(2 ** attempt_num, 10)
+        jitter = random.uniform(0, 1)
+        expected = delay * (1 + jitter)
+        with patch('random.uniform', return_value=jitter):
+            self.assertEqual(calculate_backoff(attempt_num), expected)
 
-        # Verify that random.uniform was called with the correct arguments
-        mock_uniform.assert_called_with(0, 1)
-        self.assertEqual(mock_uniform.call_count, 3)
+    def test_raises_no_input(self):
+        with self.assertRaises(TypeError):
+            calculate_backoff()
+
+    def test_raises_none_input(self):
+        with self.assertRaises(TypeError):
+            calculate_backoff(None)
+
+    def test_raises_invalid_input(self):
+        with self.assertRaises(TypeError):
+            calculate_backoff('invalid')
 
 
 if __name__ == '__main__':
