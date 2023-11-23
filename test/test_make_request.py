@@ -7,8 +7,8 @@ from unittest.mock import Mock, patch, call
 class MakeRequestTestCase(unittest.TestCase):
     def setUp(self):
         self.session = requests.Session()
-        self.send_path = 'raspberryrequest.request.Session.send'
-        self.prepare_request_path = 'raspberryrequest.request.Session.prepare_request'
+        self.send_path = 'raspberryrequest.request.requests.Session.send'
+        self.prepare_request_path = 'raspberryrequest.request.requests.Session.prepare_request'
         self.response_obj = requests.Response()
         self.response_obj.headers['Content-Type'] = 'application/json'
 

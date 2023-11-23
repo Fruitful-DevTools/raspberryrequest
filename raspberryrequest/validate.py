@@ -1,6 +1,6 @@
 import requests
 import logging
-from raspberryrequest.config import VALID, NONRETRYABLE, RETRYABLE, FATAL
+from raspberryrequest.config import StatusCodes
 from raspberryrequest.exceptions import NonRetryableStatusCodeError, FatalStatusCodeError
 
 logging.basicConfig(
@@ -10,27 +10,33 @@ logging.basicConfig(
 )
 
 
-def valid_status(response: requests.Response) -> bool:
-    print(response.text)
-    if not response.status_code:
+def valid_status(response: requests.Response, status_codes: StatusCodes) -> bool:
+    """
+    Check if the response status code is valid based on the given
+    status codes.
+
+    - :param `response`: The response object to check.
+    - :type `response`: `requests.Response`
+    - :param `status_codes`: The status codes to check against.
+    - :type `status_codes`: `StatusCodes`
+    - :return: `True` if the response status code is valid, `False` otherwise.
+    - :rtype: `bool`
+    """
+    code = response.status_code
+
+    if not code:
         logging.warning('No response status code.')
         return False
 
-    code = response.status_code
-
-    logging.debug('CODE: ', code)
-    if response.status_code in VALID or code in VALID:
-        logging.debug('Valid response code.')
+    if code in status_codes.VALID:
         return True
-    elif response.status_code in RETRYABLE or code in RETRYABLE:
-        logging.debug('Retryable response code.')
+    if code in status_codes.RETRYABLE:
         return False
-    elif response.status_code in NONRETRYABLE or code in NONRETRYABLE:
-        logging.debug('Non-retryable response code.')
+    if code in status_codes.NONRETRYABLE:
         raise NonRetryableStatusCodeError(
-            f'Cannot retry. Non-retryable status: {response.status_code}')
-    elif response.status_code in FATAL or code in FATAL:
-        logging.debug('Fatal response code.')
+            f'Cannot retry. Non-retryable status: {code}')
+    if code in status_codes.FATAL:
         raise FatalStatusCodeError(
-            f'Fatal status code: {response.status_code}. Raspberry request will stop.')
+            f'Fatal status code: {code}. Raspberry request will stop.')
+
     return False

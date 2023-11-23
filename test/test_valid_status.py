@@ -2,10 +2,14 @@ import unittest
 from unittest.mock import Mock
 from raspberryrequest.validate import valid_status
 from raspberryrequest.exceptions import NonRetryableStatusCodeError, FatalStatusCodeError
+from raspberryrequest.config import StatusCodes
 import requests
 
 
 class TestValidStatus(unittest.TestCase):
+
+    def setUp(self):
+        self.status_codes = StatusCodes()
 
     def test_valid_status_valid_status(self):
 
@@ -15,7 +19,7 @@ class TestValidStatus(unittest.TestCase):
         response.reason = "test"
 
         # The function should return True for valid statuses
-        result = valid_status(response)
+        result = valid_status(response, self.status_codes)
         self.assertTrue(result)
 
     def test_valid_status_retryable_status(self):
@@ -25,7 +29,7 @@ class TestValidStatus(unittest.TestCase):
         response.reason = "test"
 
         # The function should return False for retryable statuses
-        result = valid_status(response)
+        result = valid_status(response, self.status_codes)
         self.assertFalse(result)
 
     def test_valid_status_non_retryable_status(self):
@@ -36,7 +40,7 @@ class TestValidStatus(unittest.TestCase):
 
         # The function should raise a NonRetryableStatusCodeError
         with self.assertRaises(NonRetryableStatusCodeError) as context:
-            valid_status(response)
+            valid_status(response, self.status_codes)
 
         # Check that the error message is as expected
         self.assertIn("Cannot retry. Non-retryable status: 308",
@@ -50,7 +54,7 @@ class TestValidStatus(unittest.TestCase):
 
         # The function should raise a FatalStatusCodeError
         with self.assertRaises(FatalStatusCodeError) as context:
-            valid_status(response)
+            valid_status(response, self.status_codes)
 
         # Check that the error message is as expected
         self.assertIn(

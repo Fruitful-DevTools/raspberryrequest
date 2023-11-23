@@ -22,7 +22,7 @@ class TestSendApiRequest(unittest.TestCase):
         self.params = {"param1": "value1", "param2": "value2"}
         self.data = {"key1": "value1", "key2": "value2"}
         self.headers = {"Content-Type": "application/json"}
-        self.api_client = APIRequestHandler(headers=self.headers)
+        self.handler = APIRequestHandler(headers=self.headers)
 
     def test_happy_path(self):
         validate_return = True
@@ -41,7 +41,7 @@ class TestSendApiRequest(unittest.TestCase):
         }
         with patch("raspberryrequest.main.valid_status") as mock_valid_status:
             mock_valid_status.return_value = validate_return
-            response = self.api_client.send_api_request(
+            response = self.handler.send_api_request(
                 self.base_url, self.method, self.params, self.headers)
         self.assertDictEqual(expected, response)
 
@@ -49,23 +49,23 @@ class TestSendApiRequest(unittest.TestCase):
         with patch("requests.Session.send") as mock_send:
             mock_send.side_effect = requests.exceptions.Timeout
             with self.assertRaises(MaxRetryError):
-                self.api_client.send_api_request(
+                self.handler.send_api_request(
                     self.base_url, self.method, self.params, self.headers)
-            attempts = self.api_client.calls
+            attempts = self.handler.calls
             self.assertEqual(attempts, 3)
 
     def test_HTTPError(self):
         with patch("requests.Session.send") as mock_send:
             mock_send.side_effect = requests.exceptions.HTTPError
             with self.assertRaises(MaxRetryError):
-                self.api_client.send_api_request(
+                self.handler.send_api_request(
                     self.base_url, self.method, self.params, self.headers)
-            attempts = self.api_client.calls
+            attempts = self.handler.calls
             self.assertEqual(attempts, 3)
 
     def test_NonRetryableStatusCodeError(self):
         self.base_url = "https://reqres.in/api/users/23"
-        result = self.api_client.send_api_request(
+        result = self.handler.send_api_request(
             self.base_url, self.method, self.params, self.headers)
         self.assertIsNone(result)
 
@@ -76,17 +76,37 @@ class TestSendApiRequest(unittest.TestCase):
         with patch("requests.Session.send") as mock_send:
             mock_send.return_value = response
             with self.assertRaises(FatalStatusCodeError):
-                self.api_client.send_api_request(
+                self.handler.send_api_request(
                     self.base_url, self.method, self.params, self.headers)
 
-    def test_edge_case_no_base_url(self):
-        pass
+    def test_close_session(self):
+        self.handler.close_session()
 
-    def test_edge_case_none_params(self):
-        pass
+    def test_add_status_code(self):
+        new_status_code = 260
+        expected_list = [200, 201, 260]
+        self.handler.add_status_code("VALID", new_status_code)
+        list = self.handler.status_codes.VALID
 
-    def test_edge_case_none_headers(self):
-        pass
+        self.assertListEqual(expected_list, list)
+
+    def test_remove_status_code(self):
+        removed_status_code = 260
+        expected_list = [200, 201]
+        self.handler.remove_status_code("VALID", removed_status_code)
+        list = self.handler.status_codes.VALID
+
+        self.assertListEqual(expected_list, list)
+
+    def test_get_status_codes(self):
+        status_codes = self.handler.get_status_codes()
+        self.assertEqual(status_codes, handler.status_codes)
+
+    def test_print_status_codes(self):
+        self.handler.print_status_codes()
+
+    def tearDown(self):
+        self.handler = APIRequestHandler(headers=self.headers)
 
 
 if __name__ == '__main__':
