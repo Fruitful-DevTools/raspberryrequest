@@ -24,7 +24,26 @@ class APIRequestHandler:
 
     def __init__(self, headers: Dict[str, str] = None,
                  max_attempts: int = 3, max_delay: int = 10, **kwargs):
+        """
+        Initializes an instance of the class.
 
+        Parameters:
+        -----------
+        - :param `headers`: A dictionary of headers to be
+        included in the requests made by the session.
+        Defaults to None.
+        - :type `headers`: `Dict[str, str]`
+        - :param `max_attempts`: The maximum number of attempts
+        to be made for each request. Defaults to 3.
+        - :type `max_attempts`: int
+        - :param `max_delay`: The maximum delay (in seconds)
+        between attempts for each request. Defaults to 10.
+        - :type `max_delay`: int
+        - :param `**kwargs`: Additional keyword arguments:
+            - :param `paid_status_codes`: A list of status codes
+            that are considered "paid".
+            - :type `paid_status_codes`: `List[int]`
+        """
         self.headers = headers or {}
         self.max_attempts = max_attempts
         self.max_delay = max_delay
@@ -45,17 +64,56 @@ class APIRequestHandler:
         """
         Sends an API request with retry logic.
 
-        :param base_url: The base URL of the API.
-        :type base_url: str
-        :param method: The HTTP method of the request
-        :type method: Literal['GET', 'POST']
-        :param params: The query parameters to be included in the
+        Parameters:
+        -----------
+        - :param `base_url`: The base URL of the API.
+        - :type `base_url`: str
+        - :param `method`: The HTTP method of the request
+        - :type `method`: `Literal['GET', 'POST']`
+        - :param `params`: The query parameters to be included in the
         request.
-        :type params: Dict[str, str]
-        :param headers: The headers to be included in the request.
-        :type headers: Dict[str, str]
-        :return: The JSON response from the API.
-        :rtype: Dict
+        - :type `params`: `Dict[str, str]`
+        - :param `headers`: The headers to be included in the request.
+        - :type `headers`: `Dict[str, str]`
+
+        Returns:
+        --------
+        - :return: The JSON response from the API.
+        - :rtype: `Dict`
+
+        Raises:
+        -------
+        - :raises `MaxRetryError`: If the maximum number of attempts.
+        has been reached.
+        - :raises `NonRetryableStatusCodeError`: If the status code
+        is not in the list of retryable status codes.
+        - :raises `FatalStatusCodeError`: If the status code is
+        in the list of fatal status codes.
+        -------------------------------------------
+
+        Example:
+        --------
+        ```python
+        from raspberryrequest import APIRequestHandler
+        headers = {"Content-Type": "application/json"}
+        max_attempts = 3
+        max_delay = 10
+
+        # Set paid status codes
+        # List of status codes that are charged for by the API.
+        paid_status_codes = [200, 201, 260]
+
+        handler = APIRequestHandler(headers=headers,
+                                    max_attempts=max_attempts,
+                                    max_delay=max_delay,
+                                    paid_status_codes=paid_status_codes)
+
+        response = handler.send_api_request(base_url="https://example.com", 
+        method="GET", params={"param1": "value1"}, headers=headers)
+
+        print(response)
+        # {'example': 'response'}
+        ```
         """
         headers = headers or self.headers
 
