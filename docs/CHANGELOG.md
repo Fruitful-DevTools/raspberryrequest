@@ -23,7 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - config.py
 
-## [0.0.1] - 2023-11-23
+## [1.0.0] - 2023-11-23
 
 ## Added
 

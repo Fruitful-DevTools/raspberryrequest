@@ -1,4 +1,4 @@
-import logging
+
 from typing import Dict, Literal
 import requests
 import time
@@ -10,13 +10,6 @@ from .backoff import calculate_backoff
 from .validate import validate_status, update_session_data
 from .request import make_request
 from .models import SessionData, StatusCodes
-
-logger = logging.basicConfig(
-    level=logging.WARNING,
-    format=' %(asctime)s - %(levelname)s - %(message)s',
-    handlers=[logging.StreamHandler(),
-              logging.FileHandler('proxypull.log')]
-)
 
 
 class APIRequestHandler:
@@ -193,8 +186,10 @@ class APIRequestHandler:
         """
         Get the status codes.
 
-        :return: The status codes.
-        :rtype: `StatusCodes`
+        Returns:
+        --------
+        - :return: The status codes.
+        - :rtype: `StatusCodes`
         """
         return self.status_codes
 

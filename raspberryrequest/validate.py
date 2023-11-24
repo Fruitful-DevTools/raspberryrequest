@@ -1,13 +1,5 @@
-import requests
-import logging
 from .exceptions import NonRetryableStatusCodeError, FatalStatusCodeError
 from .models import SessionData, StatusCodes
-
-logging.basicConfig(
-    level=logging.DEBUG,
-    format=' %(asctime)s - %(levelname)s - %(message)s',
-    handlers=[logging.StreamHandler(), logging.FileHandler('proxypull.log')]
-)
 
 status_code = StatusCodes()
 

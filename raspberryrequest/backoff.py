@@ -22,8 +22,6 @@ Example:
     import backoff_calculator
 
     # Use the calculate_backoff function
-    attempts = 3
-    max_delay = 10
     backoff_time = backoff_calculator.calculate_backoff(attempt_number=3, max_delay=10)
     ```
 """
