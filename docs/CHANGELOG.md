@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2023-11-24
+
+## Added
+
+- SessionData class
+- Functionality to retrieve and reset session data from APIRequestHandler class
+- update_session_data function
+
+## Changed
+
+- Refractored valid_status.
+- Changed name of valid_status to validate_status.
+- StatusCodes to models.py
+
+## Removed
+
+- config.py
+
 ## [0.0.1] - 2023-11-23
 
 ## Added

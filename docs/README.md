@@ -3,11 +3,13 @@
 RaspberryRequest is a simple, easy-to-use py package for making HTTP requests and managing responses. RaspberryRequest is designed for easy building around getting and posting data to APIs, utilising the well-known requests module.
 
 ## **Features**
+
 1. Custom Handling of responses based on response status codes.
 2. Exponential backoff implementation, with custom number of retries and maximum delay time.
 3. Call counter.
 
 ## Table of Contents
+
 - [Installation](#installation)
 - [Usage](#usage)
 - [API Reference](#api-reference)
@@ -18,7 +20,7 @@ RaspberryRequest is a simple, easy-to-use py package for making HTTP requests an
 
 Installing raspberryrequest can be done simply and easily via pip:
 
-```
+```python
 pip install raspberryrequest # And you're good to go!
 ```
 

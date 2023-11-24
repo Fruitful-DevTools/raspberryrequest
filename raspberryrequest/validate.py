@@ -1,7 +1,7 @@
 import requests
 import logging
-from raspberryrequest.config import StatusCodes
-from raspberryrequest.exceptions import NonRetryableStatusCodeError, FatalStatusCodeError
+from .exceptions import NonRetryableStatusCodeError, FatalStatusCodeError
+from .models import SessionData, StatusCodes
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -9,25 +9,63 @@ logging.basicConfig(
     handlers=[logging.StreamHandler(), logging.FileHandler('proxypull.log')]
 )
 
+status_code = StatusCodes()
 
-def valid_status(response: requests.Response, status_codes: StatusCodes) -> bool:
+
+def update_session_data(code: int, status_codes: StatusCodes,
+                        session_data: SessionData) -> SessionData:
     """
-    Check if the response status code is valid based on the given
+    Update the session data based on the given code and status
+    codes.
+
+    Parameters:
+    -----------
+    - `code`: An integer representing the code.
+    - `status_codes`: An instance of the `StatusCodes` class.
+    - `session_data`: An instance of the `SessionData` class.
+
+    Returns:
+    --------
+    - The updated session data.
+    """
+    session_data.PAID += code in status_codes.PAID
+    session_data.UNPAID += code not in status_codes.PAID
+
+    session_data.VALID += code in status_codes.VALID
+    session_data.RETRYABLE += code in status_codes.RETRYABLE
+    session_data.NONRETRYABLE += code in status_codes.NONRETRYABLE
+    session_data.FATAL += code in status_codes.FATAL
+    # print(session_data)
+    return session_data
+
+
+def validate_status(code, status_codes: StatusCodes) -> bool:
+    """
+    Validate the status code against a set of predefined status
+    codes.
+
+    - :param `code`: The status code to be validated.
+    - :param `status_codes`: An object containing the predefined
     status codes.
-
-    - :param `response`: The response object to check.
-    - :type `response`: `requests.Response`
-    - :param `status_codes`: The status codes to check against.
+    - :type `code`: `int`
     - :type `status_codes`: `StatusCodes`
-    - :return: `True` if the response status code is valid, `False` otherwise.
+
+    Returns:
+    --------
+    - :return: True if the code is valid, False otherwise.
     - :rtype: `bool`
+
+    Raises:
+    --------
+    - :raises `NonRetryableStatusCodeError`: If the code is not in
+    `NONRETRYABLE` status codes.
+    - :raises `FatalStatusCodeError`: If the code is in the `FATAL`
+    status codes.
     """
-    code = response.status_code
 
     if not code:
         logging.warning('No response status code.')
         return False
-
     if code in status_codes.VALID:
         return True
     if code in status_codes.RETRYABLE:

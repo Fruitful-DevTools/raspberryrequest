@@ -7,9 +7,9 @@ from requests import ReadTimeout, Timeout, HTTPError
 from .exceptions import (FatalStatusCodeError, MaxRetryError,
                          NonRetryableStatusCodeError)
 from .backoff import calculate_backoff
-from .validate import valid_status
+from .validate import validate_status, update_session_data
 from .request import make_request
-from .config import StatusCodes
+from .models import SessionData, StatusCodes
 
 logger = logging.basicConfig(
     level=logging.WARNING,
@@ -23,27 +23,18 @@ class APIRequestHandler:
     call_number = 0
 
     def __init__(self, headers: Dict[str, str] = None,
-                 max_attempts: int = 3, max_delay: int = 10):
-        """
-        Initializes the `APIRequestHandler`.
+                 max_attempts: int = 3, max_delay: int = 10, **kwargs):
 
-        :param headers: The headers to be included in the
-        API requests.
-        :type headers: Dict[str, str]
-        :param max_attempts: The maximum number of retry
-        attempts for failed requests.
-        :type max_attempts: int
-        :param max_delay: The maximum delay allowed for
-        backoff.
-        :type max_delay: int
-        """
         self.headers = headers or {}
         self.max_attempts = max_attempts
         self.max_delay = max_delay
 
+        self.session_data = SessionData()
+        self.status_codes = StatusCodes()
+        self.status_codes.PAID = kwargs.get('paid_status_codes', [])
+
         self.session = requests.Session()
         self.session.headers.update(self.headers)
-        self.status_codes = StatusCodes()
 
     def send_api_request(
             self,
@@ -73,11 +64,14 @@ class APIRequestHandler:
                 self.call_number += 1
                 response = make_request(
                     base_url, method, headers, params, self.session)
+                status_code = response.status_code
             except (ReadTimeout, Timeout, HTTPError):
                 self._backoff(base_url, method, params, headers)
 
             try:
-                if valid_status(response, self.status_codes):
+                self.session_data = update_session_data(
+                    status_code, self.status_codes, self.session_data)
+                if validate_status(status_code, self.status_codes):
                     return response.json()
             except NonRetryableStatusCodeError:
                 return None
@@ -95,6 +89,7 @@ class APIRequestHandler:
         session.
         """
         self.call_number = 0
+        self.session_data.reset()
         self.session.close()
 
     def add_status_code(self,
@@ -113,7 +108,7 @@ class APIRequestHandler:
         - :param `status_code`: The status code to add.
         - :type `status_code`: `int`
         """
-        status_list = getattr(self.status_codes, status_list_name)
+        status_list = getattr(StatusCodes, status_list_name)
         if status_code not in status_list:
             status_list.append(status_code)
 
@@ -153,7 +148,10 @@ class APIRequestHandler:
         `status_codes` attribute of the `APIRequestHandler`
         object.
         """
-        print(self.status_codes)
+        print(StatusCodes)
+
+    def get_session_data(self):
+        return dict(SessionData.__dict__)
 
     def _backoff(self, base_url: str,
                  method: Literal['GET', 'POST'] = 'GET',
