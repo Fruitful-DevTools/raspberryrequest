@@ -1,4 +1,4 @@
-# RaspberryRequest - v0.0.1
+# RaspberryRequest - v1.1.0
 
 RaspberryRequest is a simple, easy-to-use py package for making HTTP requests and managing responses. RaspberryRequest is designed for easy building around getting and posting data to APIs, utilising the well-known requests module.
 
