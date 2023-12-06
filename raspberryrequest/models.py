@@ -35,6 +35,17 @@ class SessionData:
             self.FATAL
         ])
 
+    def get_dict(self):
+        return {
+            'VALID': self.VALID,
+            'RETRYABLE': self.RETRYABLE,
+            'NONRETRYABLE': self.NONRETRYABLE,
+            'FATAL': self.FATAL,
+            'TOTAL': self.TOTAL,
+            'PAID': self.PAID,
+            'UNPAID': self.UNPAID
+        }
+
 
 @dataclass
 class StatusCodes:

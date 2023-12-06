@@ -1,5 +1,11 @@
+import logging
+import sys
 from .exceptions import NonRetryableStatusCodeError, FatalStatusCodeError
 from .models import SessionData, StatusCodes
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+logger.addHandler(logging.StreamHandler(sys.stdout))
+
 
 status_code = StatusCodes()
 
@@ -21,13 +27,17 @@ def update_session_data(code: int, status_codes: StatusCodes,
     - The updated session data.
     """
     session_data.PAID += code in status_codes.PAID
+    logger.debug('PAID: %s', session_data.PAID)
     session_data.UNPAID += code not in status_codes.PAID
-
+    logger.debug('UNPAID: %s', session_data.UNPAID)
     session_data.VALID += code in status_codes.VALID
+    logger.debug('VALID: %s', session_data.VALID)
     session_data.RETRYABLE += code in status_codes.RETRYABLE
+    logger.debug('RETRYABLE: %s', session_data.RETRYABLE)
     session_data.NONRETRYABLE += code in status_codes.NONRETRYABLE
+    logger.debug('NONRETRYABLE: %s', session_data.NONRETRYABLE)
     session_data.FATAL += code in status_codes.FATAL
-    # print(session_data)
+    logger.debug('FATAL: %s', session_data.FATAL)
     return session_data
 
 

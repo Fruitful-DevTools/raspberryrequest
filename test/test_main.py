@@ -145,11 +145,27 @@ class TestSendApiRequest(unittest.TestCase):
         handler = APIRequestHandler(headers=headers)
         handler.print_status_codes()
 
-    def test_get_session_codes(self):
+    def test_get_session_data(self):
         headers = {"Content-Type": "application/json"}
         handler = APIRequestHandler(headers=headers)
         session_data = handler.get_session_data()
+        print("SESSION DATA: ", session_data)
         self.assertIsInstance(session_data, dict)
+        print("GET SESSION DATA ONE: ", session_data['PAID'])
+
+
+class TestGetSessionData(unittest.TestCase):
+
+    def test_happy_path(self):
+        paid_status_codes = [200, 201, 404]
+        handler = APIRequestHandler(paid_status_codes=paid_status_codes)
+        response = make_request_obj(200)
+        response._content = b'{"test": "test", "test2": "test2"}'
+        with patch("raspberryrequest.request.requests.Session.send") as mock_send:
+            mock_send.return_value = response
+            handler.send_api_request("https://reqres.in/api/users/2", "GET")
+            session_data = handler.get_session_data()
+            self.assertEqual(session_data['PAID'], 1)
 
 
 if __name__ == '__main__':
